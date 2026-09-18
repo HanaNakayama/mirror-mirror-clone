@@ -1,9 +1,11 @@
 import './Hero.css'
 import { Footer } from '../Footer';
+import Header from '../Header';
 
 export default function Hero() {
   return (
     <>
+      <Header />
       <div className='slider'>
         <ul className="slider-inner">
           <li><img src={"top.webp"} /></li>

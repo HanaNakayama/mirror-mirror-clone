@@ -121,7 +121,9 @@ export default function Header() {
 
           {/* Reservation */}
           <li className="nav-item">
-            Reservation
+            <Link to="/Reservation">
+              Reservation
+            </Link>
           </li>
 
         </ul>

@@ -1,12 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
 import Hero from "./components/Hero/Hero";
+import Reservation from "./pages/Reservation/Reservation";
+import { CustomerInfo } from "./pages/Reservation/CustomerInfo/CustomerInfo";
 import OriginalDress from "./pages/OriginalDress/OriginalDress";
+import { InputForm } from "./pages/Reservation/CustomerInfo/InputForm";
+import { NoPartnership } from "./pages/Reservation/CustomerInfo/NoPartnership";
+import { Appoint } from "./pages/Reservation/Appoint";
 
 function App() {
   return (
     <BrowserRouter>
-      <Header />
 
       <Routes>
         <Route
@@ -15,11 +18,36 @@ function App() {
         />
 
         <Route
+          path="/Reservation"
+          element={<Reservation />}
+        />
+
+        <Route
+          path="/Reservation/Appoint"
+          element={<Appoint />}
+        />
+
+        <Route
+          path="/Reservation/CustomerInfo/CustomerInfo"
+          element={<CustomerInfo />}
+        />
+
+        <Route
+          path="/Reservation/CustomerInfo/NoPartnership"
+          element={<NoPartnership />}
+        />
+
+        <Route
+          path="/Reservation/CustomerInfo/InputForm"
+          element={<InputForm />}
+        />
+
+        <Route
           path="/original-dress"
           element={<OriginalDress />}
         />
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter >
 
   );
 }
