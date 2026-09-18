@@ -1,11 +1,9 @@
-import Header from '../../components/Header';
 import './OriginalDress.css';
 import { useState } from 'react';
 export default function OriginalDress() {
   const [isColor, setIsColor] = useState(true);
   return (
     <>
-      <Header />
       <div className="main">
         <img src="originalDress.png"></img>
       </div>

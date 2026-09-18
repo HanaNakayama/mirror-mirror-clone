@@ -157,7 +157,7 @@ h3 {
   transform: scale(1.1);
 }
 
-.button {
+button {
   color: #151515;
   border: 1px solid #151515;
   background: transparent;
