@@ -6,6 +6,10 @@ import OriginalDress from "./pages/OriginalDress/OriginalDress";
 import { InputForm } from "./pages/Reservation/CustomerInfo/InputForm";
 import { NoPartnership } from "./pages/Reservation/CustomerInfo/NoPartnership";
 import { Appoint } from "./pages/Reservation/Appoint";
+import QA from "./pages/QA/QA";
+import Shop from "./pages/Shop/Shop";
+import News from "./pages/News/News";
+import Tuxedo from "./pages/OriginalDress/Tuxedo";
 
 function App() {
   return (
@@ -45,6 +49,26 @@ function App() {
         <Route
           path="/original-dress"
           element={<OriginalDress />}
+        />
+
+        <Route
+          path="/OriginalDress/Tuxedo"
+          element={<Tuxedo />}
+        />
+
+        <Route
+          path="/QA"
+          element={<QA />}
+        />
+
+        <Route
+          path="/Shop"
+          element={<Shop />}
+        />
+
+        <Route
+          path="/News"
+          element={<News />}
         />
       </Routes>
     </BrowserRouter >

@@ -5,6 +5,8 @@ import { MustQuestion } from "./Question";
 
 const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+const heights = Array.from({ length: 71 }, (_, i) => i + 130);
+const footsize = Array.from({ length: 10 }, (_, i) => i + 21);
 
 export const InputForm = () => {
 
@@ -110,14 +112,21 @@ export const InputForm = () => {
           <br />
 
           <div className="flex items-center">
-            <MustQuestion question={"身長"}></MustQuestion>
+            <MustQuestion question={"身長"} />
+            <div className="px-2">
+              <select className="border px-4" {...register("height", { required: "身長を入力してください" })} >
+                <option value="">選択してください</option>
+                {heights.map((height) => {
+                  return (<option key={height} value={height}> {height}cm
+                  </option>);
+                })}
+              </select>
+            </div>
           </div>
           <br />
 
           <div className="flex items-center">
             <MustQuestion question={"号数"}></MustQuestion>
-          </div>
-          <div className="flex items-center">
             <div className="px-2">
               <select className="border px-4" {...register("size", { required: "号数を入力してください" })} name="year">
                 <option value="S">S（７号）</option>
@@ -127,6 +136,107 @@ export const InputForm = () => {
             </div>
           </div>
           <br />
+
+          <div className="flex items-center">
+            <MustQuestion question={"靴のサイズ"} />
+            <div className="px-2">
+              <select className="border px-4" {...register("footsize", { required: "靴のサイズを入力してください" })} >
+                <option value="">選択してください</option>
+                {footsize.map((size) => { return (<option key={size} value={size}> {size}cm </option>); })}
+              </select>
+            </div>
+          </div>
+          <br />
+
+          <div className="flex items-center">
+            <MustQuestion question={"メールアドレス"} />
+            <input type="email" className="h-10 w-80 border m-2 px-2" placeholder="example@example.com" {...register("email",
+              {
+                required: "メールアドレスを入力してください", pattern:
+                  { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "正しいメールアドレスを入力してください" }
+              })} />
+          </div>
+          <br />
+
+          <div className="flex items-center">
+            <MustQuestion question={"携帯電話番号"} />
+            <input type="tel" className="h-10 w-80 border m-2 px-2" placeholder="09012345678"
+              {...register("phone", {
+                required: "携帯電話番号を入力してください", pattern: {
+                  value: /^0\d{9,10}$/, message: "正しい電話番号を入力してください"
+                }
+              })} />
+          </div>
+          <br />
+
+          <label className="text-left px-5 font-serif text-xl pt-10">
+            ご新郎様情報
+          </label>
+          <hr className="py-4" />
+
+          <div className="flex items-center">
+            <MustQuestion question={"ご新郎様お名前（旧姓）"} />
+            <input
+              type="text"
+              className="h-10 w-40 border m-2"
+              placeholder="姓"
+              {...register("groomLastName", {
+                required: "姓を入力してください"
+              })}
+            />
+            <input
+              type="text"
+              className="h-10 w-40 border m-2"
+              placeholder="名"
+              {...register("groomFirstName", {
+                required: "名を入力してください"
+              })}
+            />
+          </div>
+          <br />
+
+          <div className="flex items-center">
+            <MustQuestion question={"ご新郎様ふりがな（旧姓）"} />
+            <input
+              type="text"
+              className="h-10 w-40 border m-2"
+              placeholder="せい"
+              {...register("groomLastNameFurigana", {
+                required: "姓のふりがなを入力してください",
+                pattern: {
+                  value: /^[ぁ-ゖー]+$/,
+                  message: "ひらがなで入力してください"
+                }
+              })}
+            />
+            <input
+              type="text"
+              className="h-10 w-40 border m-2"
+              placeholder="めい"
+              {...register("groomFirstNameFurigana", {
+                required: "名のふりがなを入力してください",
+                pattern: {
+                  value: /^[ぁ-ゖー]+$/,
+                  message: "ひらがなで入力してください"
+                }
+              })}
+            />
+          </div>
+          <br />
+
+          <label className="text-left px-5 font-serif text-xl pt-10">
+            ご試着店舗
+          </label>
+          <div className="flex">
+            <img src="/shop1.png" className="w-80 h-60" />
+            <div>
+              <p>挙式会場がフォーシーズンズホテル東京大手町のお客様は</p><br />
+              <p>丸の内店</p><br />
+              <p>にご来店ください。</p>
+            </div>
+          </div>
+          <br />
+
 
 
           <button className="text-white bg-[#233B6C] h-15 w-70 rounded-xl" onClick={onSubmit}>

@@ -5,6 +5,8 @@
 
 .title img {
   width: 600px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .title {
@@ -13,12 +15,17 @@
   ;
 }
 
+.concept {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
 p {
   text-align: center;
 }
 
 
-.button {
+.dressButtons button {
   color: #151515;
   border: 1px solid #151515;
   background: transparent;
@@ -30,10 +37,13 @@ p {
   font-family: "Didot";
 }
 
-h1 {
+.originalDressHeading {
   font-family: "Didot";
   text-align: center;
   font-size: 45px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+
 }
 
 .dressButtons {
@@ -42,6 +52,8 @@ h1 {
   align-items: center;
   gap: 0px;
   padding-bottom: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .dressButtons button {
