@@ -1,0 +1,36 @@
+.main img {
+  width: 100vw;
+  padding-bottom: 30px;
+}
+
+.title img {
+  width: 600px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  ;
+}
+
+.concept {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+p {
+  text-align: center;
+}
+
+
+
+h1 {
+  font-family: "Didot";
+  text-align: center;
+  font-size: 45px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+
+}

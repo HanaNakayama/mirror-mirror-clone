@@ -6,7 +6,10 @@
   justify-content: space-between;
   align-items: center;
   background: white;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   z-index: 100;
 }
 
@@ -31,6 +34,12 @@
   position: relative;
   padding: 20px 0;
   height: 100%;
+}
+
+.nav-item:hover {
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.3s;
 }
 
 

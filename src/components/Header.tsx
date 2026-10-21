@@ -54,8 +54,8 @@ export default function Header() {
                 </li>
 
                 <li>
-                  <Link to="/dress/mens">
-                    Mens
+                  <Link to="/OriginalDress/Tuxedo">
+                    Tuxedo
                   </Link>
                 </li>
 
@@ -90,21 +90,24 @@ export default function Header() {
 
 
           {/* Shop */}
-          <li className="nav-item">
+          <Link to="/Shop"><li className="nav-item">
             Shop ∨
           </li>
+          </Link>
 
 
           {/* Q&A */}
-          <li className="nav-item">
+          <Link to="/QA"><li className="nav-item">
             Q&A
-          </li>
+          </li></Link>
 
 
           {/* News */}
-          <li className="nav-item">
-            News
-          </li>
+          <Link to="/News">
+            <li className="nav-item">
+              News
+            </li>
+          </Link>
 
 
           {/* Recruit */}
