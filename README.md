@@ -71,3 +71,83 @@ export default defineConfig([
   },
 ])
 ```
+
+## Mirror Mirror Clone
+
+### この変更で用意したもの
+
+- SQLiteの予約データベース（`data/reservations.sqlite`）
+- 予約データを保存する `POST /api/reservations`
+- 管理画面から一覧を読む `GET /api/admin/reservations`
+
+管理画面と既存フォームは変更していません。**そのため今の予約フォームを送信してもDBには保存されません。** フォームの送信処理から保存APIを呼び出すと、保存が始まります。
+
+### 開発環境
+
+Node.js 22.13 以降を使います。開発サーバーと保存APIは、まとめて次のコマンドで起動します。
+
+```sh
+npm install
+npm run dev
+```
+
+予約データはプロジェクト内の `data/reservations.sqlite` に保存されます。DBとSQLiteの一時ファイルはGit管理対象外です。
+
+### 既存フォームから保存する方法
+
+フォームの送信ハンドラーで、入力値をそのままJSONとしてAPIへ送ります。たとえば `react-hook-form` の `onSubmit(data)` なら、次のように接続できます。
+
+```ts
+const response = await fetch("/api/reservations", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+});
+
+if (!response.ok) {
+  throw new Error("予約を保存できませんでした");
+}
+
+const { id } = await response.json();
+```
+
+### 保存APIの入力形式
+
+`POST /api/reservations` は、現在のフォームの入力名をキーにしたJSONを受け取ります。`selectedPlace` は任意です。
+
+```json
+{
+  "year": "2027",
+  "month": "10",
+  "day": "20",
+  "selectedPlace": "東京ステーションホテル",
+  "ceremonyPlace": "東京ステーションホテル",
+  "partyPlace": "東京ステーションホテル",
+  "lastName": "山田",
+  "firstName": "花子",
+  "lastNameFurigana": "やまだ",
+  "firstNameFurigana": "はなこ",
+  "birthYear": "1995",
+  "birthMonth": "4",
+  "birthDay": "12",
+  "size": "M"
+}
+```
+
+成功時は `201` と `{ "id": 1 }` を返します。挙式日・生年月日はDBで `YYYY-MM-DD` にまとめて保存します。テーブル定義と適用済みマイグレーションは `server/migrations/` と `schema_migrations` で管理します。
+
+### 管理画面用API
+
+管理画面から予約一覧を取得するAPIも用意しています。`ADMIN_API_TOKEN` を設定し、Bearerトークンを付けて呼び出します。
+
+```sh
+ADMIN_API_TOKEN='十分に長いランダムな値' npm run dev
+```
+
+```http
+GET /api/admin/reservations?limit=50
+Authorization: Bearer <ADMIN_API_TOKEN>
+```
+
+取得上限は1回100件です。トークンが未設定の場合、管理APIは `503` を返します。
+ブラウザーにトークンを埋め込むと利用者から見えてしまうため、本番の管理画面ではサーバー側からこのAPIを呼び出してください。ログイン画面やセッション管理は今回の範囲に含めていません。
