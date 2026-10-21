@@ -34,9 +34,9 @@ export default function QA() {
     <>
       <Header />
 
-      <main className="w-full bg-white text-black pb-24">
+      <main className="mt-35 w-full bg-white text-black pb-24">
 
-        <h1 className="mt-35px mb-16 text-center font-['Didot'] text-5xl font-normal leading-normal tracking-wide">
+        <h1 className="mb-16 text-center font-['Didot'] text-5xl font-normal leading-normal tracking-wide">
           Q &amp; A
         </h1>
 
