@@ -117,9 +117,9 @@ const { id } = await response.json();
 
 ```json
 {
-  "year": "2027",
-  "month": "10",
-  "day": "20",
+  "year": 2027,
+  "month": 10,
+  "day": 20,
   "selectedPlace": "東京ステーションホテル",
   "ceremonyPlace": "東京ステーションホテル",
   "partyPlace": "東京ステーションホテル",
@@ -127,14 +127,24 @@ const { id } = await response.json();
   "firstName": "花子",
   "lastNameFurigana": "やまだ",
   "firstNameFurigana": "はなこ",
-  "birthYear": "1995",
-  "birthMonth": "4",
-  "birthDay": "12",
-  "size": "M"
+  "birthYear": 1995,
+  "birthMonth": 4,
+  "birthDay": 12,
+  "height": 160,
+  "size": "M",
+  "footsize": 23,
+  "email": "hanako@example.com",
+  "phone": 9012345678,
+  "groomLastName": "山田",
+  "groomFirstName": "太郎",
+  "groomLastNameFurigana": "やまだ",
+  "groomFirstNameFurigana": "たろう"
 }
 ```
 
-成功時は `201` と `{ "id": 1 }` を返します。挙式日・生年月日はDBで `YYYY-MM-DD` にまとめて保存します。テーブル定義と適用済みマイグレーションは `server/migrations/` と `schema_migrations` で管理します。
+成功時は `201` と `{ "id": 1 }` を返します。このJSON例の年・月・日、身長、靴サイズ、電話番号は数値です。挙式日・生年月日は従来どおりISO日付でも保存し、各パーツを別々の `INTEGER` 列にも保存します。身長・靴サイズ・電話番号も `INTEGER` 列です。画面のフォーム値は文字列で届いてもAPI側で数値に変換します。電話番号は数値化すると先頭の `0` が失われます。ここでは `09012345678` を `9012345678` として送ります。再表示するときは桁数に応じて先頭の `0` を補ってください。
+
+DBの列追加は `server/migrations/002_add_additional_reservation_fields.sql` にあります。すでに作成済みのDBにも、次回 `npm run dev` または `npm run server` を起動したときに自動適用されます。マイグレーション履歴は `schema_migrations` で管理します。
 
 ### 管理画面用API
 

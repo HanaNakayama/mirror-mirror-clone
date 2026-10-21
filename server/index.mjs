@@ -49,6 +49,20 @@ const insertReservation = database.prepare(`
     bride_last_name_furigana,
     bride_first_name_furigana,
     bride_birth_date,
+    ceremony_year,
+    ceremony_month,
+    ceremony_day,
+    bride_birth_year,
+    bride_birth_month,
+    bride_birth_day,
+    height_cm,
+    shoe_size,
+    phone_number,
+    email,
+    groom_last_name,
+    groom_first_name,
+    groom_last_name_furigana,
+    groom_first_name_furigana,
     dress_size
   ) VALUES (
     $selectedPlace,
@@ -60,6 +74,20 @@ const insertReservation = database.prepare(`
     $lastNameFurigana,
     $firstNameFurigana,
     $birthDate,
+    $ceremonyYear,
+    $ceremonyMonth,
+    $ceremonyDay,
+    $birthYear,
+    $birthMonth,
+    $birthDay,
+    $heightCm,
+    $shoeSize,
+    $phoneNumber,
+    $email,
+    $groomLastName,
+    $groomFirstName,
+    $groomLastNameFurigana,
+    $groomFirstNameFurigana,
     $size
   )
 `);
@@ -76,6 +104,20 @@ const selectReservations = database.prepare(`
     bride_last_name_furigana AS lastNameFurigana,
     bride_first_name_furigana AS firstNameFurigana,
     bride_birth_date AS birthDate,
+    ceremony_year AS ceremonyYear,
+    ceremony_month AS ceremonyMonth,
+    ceremony_day AS ceremonyDay,
+    bride_birth_year AS birthYear,
+    bride_birth_month AS birthMonth,
+    bride_birth_day AS birthDay,
+    height_cm AS height,
+    shoe_size AS footsize,
+    phone_number AS phone,
+    email,
+    groom_last_name AS groomLastName,
+    groom_first_name AS groomFirstName,
+    groom_last_name_furigana AS groomLastNameFurigana,
+    groom_first_name_furigana AS groomFirstNameFurigana,
     dress_size AS size,
     status,
     submitted_at AS submittedAt
@@ -124,17 +166,37 @@ function readText(body, field, maxLength = 200) {
   return value.trim();
 }
 
-function readDate(body, yearField, monthField, dayField) {
-  const rawYear = readText(body, yearField, 4);
-  const rawMonth = readText(body, monthField, 2);
-  const rawDay = readText(body, dayField, 2);
-  const year = Number(rawYear);
-  const month = Number(rawMonth);
-  const day = Number(rawDay);
+function readInteger(body, field, min, max) {
+  const value = body[field];
+  const number = typeof value === "number"
+    ? value
+    : typeof value === "string" && /^\d+$/.test(value.trim())
+      ? Number(value)
+      : NaN;
 
-  if (!/^\d{4}$/.test(rawYear) || !/^\d{1,2}$/.test(rawMonth) || !/^\d{1,2}$/.test(rawDay)) {
-    throw new HttpError(400, `A valid date is required for ${yearField}.`);
+  if (!Number.isSafeInteger(number) || number < min || number > max) {
+    throw new HttpError(400, `${field} must be an integer between ${min} and ${max}.`);
   }
+  return number;
+}
+
+function readPhoneNumber(body) {
+  const value = body.phone;
+  if (typeof value === "string" && /^0\d{9,10}$/.test(value.trim())) {
+    return Number(value.trim());
+  }
+
+  if (typeof value === "number" && Number.isSafeInteger(value) && /^\d{9,10}$/.test(String(value))) {
+    return value;
+  }
+
+  throw new HttpError(400, "phone must be a 10- or 11-digit phone number.");
+}
+
+function readDate(body, yearField, monthField, dayField) {
+  const year = readInteger(body, yearField, 1900, 2200);
+  const month = readInteger(body, monthField, 1, 12);
+  const day = readInteger(body, dayField, 1, 31);
 
   const date = new Date(Date.UTC(year, month - 1, day));
   if (
@@ -146,7 +208,12 @@ function readDate(body, yearField, monthField, dayField) {
     throw new HttpError(400, `A valid date is required for ${yearField}.`);
   }
 
-  return `${rawYear}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  return {
+    year,
+    month,
+    day,
+    iso: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+  };
 }
 
 function toReservation(body) {
@@ -156,17 +223,33 @@ function toReservation(body) {
 
   const size = readText(body, "size", 2);
   if (!["S", "M", "L"].includes(size)) throw new HttpError(400, "size must be S, M, or L.");
+  const ceremonyDate = readDate(body, "year", "month", "day");
+  const birthDate = readDate(body, "birthYear", "birthMonth", "birthDay");
 
   return {
     selectedPlace: readText(body, "selectedPlace"),
-    ceremonyDate: readDate(body, "year", "month", "day"),
+    ceremonyDate: ceremonyDate.iso,
+    ceremonyYear: ceremonyDate.year,
+    ceremonyMonth: ceremonyDate.month,
+    ceremonyDay: ceremonyDate.day,
     ceremonyPlace: readText(body, "ceremonyPlace"),
     partyPlace: readText(body, "partyPlace"),
     lastName: readText(body, "lastName"),
     firstName: readText(body, "firstName"),
     lastNameFurigana: readText(body, "lastNameFurigana"),
     firstNameFurigana: readText(body, "firstNameFurigana"),
-    birthDate: readDate(body, "birthYear", "birthMonth", "birthDay"),
+    birthDate: birthDate.iso,
+    birthYear: birthDate.year,
+    birthMonth: birthDate.month,
+    birthDay: birthDate.day,
+    heightCm: readInteger(body, "height", 130, 200),
+    shoeSize: readInteger(body, "footsize", 21, 30),
+    phoneNumber: readPhoneNumber(body),
+    email: readText(body, "email", 320),
+    groomLastName: readText(body, "groomLastName"),
+    groomFirstName: readText(body, "groomFirstName"),
+    groomLastNameFurigana: readText(body, "groomLastNameFurigana"),
+    groomFirstNameFurigana: readText(body, "groomFirstNameFurigana"),
     size,
   };
 }
