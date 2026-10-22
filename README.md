@@ -79,6 +79,7 @@ export default defineConfig([
 - SQLiteの予約データベース（`data/reservations.sqlite`）
 - 予約データを保存する `POST /api/reservations`
 - 管理画面から一覧を読む `GET /api/admin/reservations`
+- Q&A登録用の `qa_entries` テーブル
 
 管理画面と既存フォームは変更していません。**そのため今の予約フォームを送信してもDBには保存されません。** フォームの送信処理から保存APIを呼び出すと、保存が始まります。
 
@@ -161,3 +162,20 @@ Authorization: Bearer <ADMIN_API_TOKEN>
 
 取得上限は1回100件です。トークンが未設定の場合、管理APIは `503` を返します。
 ブラウザーにトークンを埋め込むと利用者から見えてしまうため、本番の管理画面ではサーバー側からこのAPIを呼び出してください。ログイン画面やセッション管理は今回の範囲に含めていません。
+
+### Q&Aテーブル
+
+`qa_entries` は管理画面で登録するQ&Aデータ用のテーブルです。質問文、回答文、表示順、公開状態、作成・更新日時を保持します。`is_published` は `1` が公開、`0` が非公開で、新規レコードは公開状態になります。
+
+テーブル定義は `server/migrations/003_create_qa_entries.sql` にあります。次回API起動時に既存DBへも自動適用されます。現時点では `QA.tsx` の表示や管理画面からの登録処理は、このテーブルに接続していません。
+
+管理画面から登録する1件分のデータ例です。`display_order` と `is_published` は数値で保存します。
+
+```json
+{
+  "question": "来店予約は必要ですか？",
+  "answer": "ご試着は完全予約制です。WebサイトのReservationからお申し込みください。",
+  "display_order": 1,
+  "is_published": 1
+}
+```
