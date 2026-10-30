@@ -10,12 +10,18 @@ import QA from "./pages/QA/QA";
 import Shop from "./pages/Shop/Shop";
 import News from "./pages/News/News";
 import Tuxedo from "./pages/OriginalDress/Tuxedo";
+import AdminReservations from "./pages/Admin/AdminReservations";
 
 function App() {
   return (
     <BrowserRouter>
 
       <Routes>
+
+        <Route
+          path="/Admin/AdminReservations"
+          element={<AdminReservations />}
+        />
         <Route
           path="/"
           element={<Hero />}
