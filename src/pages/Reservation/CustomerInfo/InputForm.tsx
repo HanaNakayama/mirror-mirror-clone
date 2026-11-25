@@ -8,6 +8,30 @@ const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 const heights = Array.from({ length: 71 }, (_, i) => i + 130);
 const footsize = Array.from({ length: 10 }, (_, i) => i + 21);
 
+type Props = {
+  year: number;
+  month: number;
+  day: number;
+  selectedPlace?: string;
+  ceremonyPlace: string;
+  partyPlace: string;
+  lastName: string;
+  firstName: string;
+  lastNameFurigana: string;
+  firstNameFurigana: string;
+  birthYear: number;
+  birthMonth: number;
+  birthDay: number;
+  height: number;
+  size: string;
+  footsize: number;
+  email: string;
+  phone: string;
+  groomLastName: string;
+  groomFirstName: string;
+  groomLastNameFurigana: string;
+  groomFirstNameFurigana: string;
+};
 export const InputForm = () => {
 
   const location = useLocation();
@@ -16,11 +40,20 @@ export const InputForm = () => {
   const {
     register,
     handleSubmit,
-  } = useForm();
+  } = useForm<Props>();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data: Props) => {
+    const response = await fetch("/api/reservations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
-    console.log(data);
+    if (!response.ok) {
+      throw new Error("予約を保存できませんでした");
+    }
+
+    const { id } = await response.json();
 
   };
 
@@ -239,7 +272,8 @@ export const InputForm = () => {
 
 
 
-          <button className="text-white bg-[#233B6C] h-15 w-70 rounded-xl" onClick={onSubmit}>
+          <button className="text-white bg-[#233B6C] h-15 w-70 rounded-xl " type="submit">
+
             確認画面へ
           </button>
         </div>
