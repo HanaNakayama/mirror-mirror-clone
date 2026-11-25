@@ -1,6 +1,8 @@
 
+import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 
+/*
 const questions = [
   {
     question: "来店予約は必要ですか？",
@@ -28,8 +30,37 @@ const questions = [
       "もちろん大丈夫です。 ただし待合スペースに限りがございますので、ご同伴者様は2名までとさせていただいております。 なお、初回はドレスのみのご試着となります。 タキシード試着、ご両親様のご試着は別途ご案内しておりますのでご了承ください。",
   },
 ];
+*/
+
+type QAItem = {
+  id: number;
+  question: string;
+  answer: string;
+};
 
 export default function QA() {
+  const [questions, setQuestions] = useState<QAItem[]>([]);
+
+  // APIから公開中のQAを取得
+  useEffect(() => {
+    const fetchQA = async () => {
+      try {
+        const response = await fetch("/api/qa");
+
+        if (!response.ok) {
+          throw new Error("Q&Aの取得に失敗しました");
+        }
+
+        const result = await response.json();
+        setQuestions(result.qa);
+      } catch (error) {
+        console.error("Q&A取得エラー:", error);
+      }
+    };
+
+    fetchQA();
+  }, []);
+
   return (
     <>
       <Header />
@@ -44,7 +75,7 @@ export default function QA() {
 
           {questions.map((item, index) => (
             <div
-              key={item.question}
+              key={item.id}
               className={`px-16 py-12 ${index % 2 === 0
                 ? "bg-stone-100"
                 : "bg-stone-200"

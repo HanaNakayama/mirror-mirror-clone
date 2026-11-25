@@ -11,6 +11,7 @@ import Shop from "./pages/Shop/Shop";
 import News from "./pages/News/News";
 import Tuxedo from "./pages/OriginalDress/Tuxedo";
 import AdminReservations from "./pages/Admin/AdminReservations";
+import AdminQA from "./pages/Admin/AdminQA";
 
 function App() {
   return (
@@ -76,8 +77,14 @@ function App() {
           path="/News"
           element={<News />}
         />
+
+        <Route
+          path="/admin/qa"
+          element={<AdminQA />} />
+
       </Routes>
     </BrowserRouter >
+
 
   );
 }

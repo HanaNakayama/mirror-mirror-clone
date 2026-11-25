@@ -1,3 +1,4 @@
+
 import { timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import { mkdirSync, readFileSync, readdirSync } from "node:fs";
@@ -124,6 +125,38 @@ const selectReservations = database.prepare(`
   FROM reservations
   ORDER BY submitted_at DESC, id DESC
   LIMIT ?
+`);
+
+// Q&A一覧取得
+const selectQA = database.prepare(`
+  SELECT
+    id,
+    question,
+    answer,
+    display_order AS displayOrder,
+    is_published AS isPublished
+  FROM qa_entries
+  ORDER BY display_order ASC, id ASC
+`);
+
+// Q&A全件削除
+const deleteQA = database.prepare(`
+  DELETE FROM qa_entries
+`);
+
+// Q&A登録
+const insertQA = database.prepare(`
+  INSERT INTO qa_entries (
+    question,
+    answer,
+    display_order,
+    is_published
+  ) VALUES (
+    $question,
+    $answer,
+    $displayOrder,
+    $isPublished
+  )
 `);
 
 class HttpError extends Error {
@@ -254,6 +287,48 @@ function toReservation(body) {
   };
 }
 
+// Q&Aデータの入力チェック
+function toQAEntries(body) {
+  if (!Array.isArray(body)) {
+    throw new HttpError(400, "Request body must be an array.");
+  }
+
+  if (body.length > 100) {
+    throw new HttpError(400, "Too many QA entries.");
+  }
+
+  return body.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      throw new HttpError(400, `Invalid QA entry at index ${index}.`);
+    }
+
+    const question = readText(item, "question", 500);
+    const answer = readText(item, "answer", 5000);
+
+    if (!question || !answer) {
+      throw new HttpError(400, "Question and answer are required.");
+    }
+
+    const isPublished =
+      item.isPublished === false || item.isPublished === 0
+        ? 0
+        : item.isPublished === true || item.isPublished === 1
+          ? 1
+          : NaN;
+
+    if (!Number.isInteger(isPublished)) {
+      throw new HttpError(400, "isPublished must be 0 or 1.");
+    }
+
+    return {
+      question,
+      answer,
+      displayOrder: index + 1,
+      isPublished,
+    };
+  });
+}
+
 function isAdminAuthorized(request) {
   const expectedToken = process.env.ADMIN_API_TOKEN;
   if (!expectedToken) return false;
@@ -290,6 +365,63 @@ const server = createServer(async (request, response) => {
       const requestedLimit = Number(url.searchParams.get("limit") ?? 50);
       const limit = Number.isInteger(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 100) : 50;
       sendJson(response, 200, { reservations: selectReservations.all(limit), limit });
+      return;
+    }
+
+    // Q&A一覧取得
+    if (request.method === "GET" && url.pathname === "/api/admin/qa") {
+      if (!process.env.ADMIN_API_TOKEN) {
+        throw new HttpError(503, "Admin API is not configured.");
+      }
+      if (!isAdminAuthorized(request)) throw new HttpError(401, "Unauthorized.");
+
+      sendJson(response, 200, { qa: selectQA.all() });
+      return;
+    }
+
+    // Q&A全件保存
+    if (request.method === "PUT" && url.pathname === "/api/admin/qa") {
+      if (!process.env.ADMIN_API_TOKEN) {
+        throw new HttpError(503, "Admin API is not configured.");
+      }
+      if (!isAdminAuthorized(request)) throw new HttpError(401, "Unauthorized.");
+
+      const entries = toQAEntries(await readJsonBody(request));
+
+      database.exec("BEGIN");
+      try {
+        deleteQA.run();
+
+        for (const item of entries) {
+          insertQA.run(item);
+        }
+
+        database.exec("COMMIT");
+      } catch (error) {
+        database.exec("ROLLBACK");
+        throw error;
+      }
+
+      sendJson(response, 200, {
+        message: "Q&A saved successfully.",
+        count: entries.length,
+      });
+      return;
+    }
+
+    // 公開用Q&A取得
+    if (request.method === "GET" && url.pathname === "/api/qa") {
+      const qa = database.prepare(`
+        SELECT
+          id,
+          question,
+          answer
+        FROM qa_entries
+        WHERE is_published = 1
+        ORDER BY display_order ASC, id ASC
+      `).all();
+
+      sendJson(response, 200, { qa });
       return;
     }
 
